@@ -2,7 +2,6 @@ import React from 'react'
 
 export default function HeroSection() {
   return (
-    <div>
       <div className="hero">
         <section className="hero-content">
           <h2 className="sr-only">Promoted Content</h2>
@@ -12,6 +11,6 @@ export default function HeroSection() {
           <p className="text">Open a savings account with Argent Bank today!</p>
         </section>
       </div>
-    </div>
+   
   );
 }

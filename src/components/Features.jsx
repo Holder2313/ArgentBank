@@ -6,7 +6,7 @@ import iconSecurity from "../img/icon-security.png";
 
 export default function Features() {
   return (
-    <div className=" features-container">
+    <section className=" features-container">
       <FeatureItem
         img={iconChat}
         title={"You are our #1 priority"}
@@ -28,6 +28,6 @@ export default function Features() {
           "We use top of the line encryption to make sure your data and money is always safe."
         }
       />
-    </div>
+    </section>
   );
 }
