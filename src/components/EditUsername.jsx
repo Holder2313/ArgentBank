@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUserName } from "../features/loginUser";
+import { updateUserName } from "../features/getUser";
+
 
 export default function EditUsername( {onCancel} ) {
-  const user = useSelector((state) => state.login.user);
+  const user = useSelector((state) => state.user.user);
   const token = useSelector((state) => state.login.token);
+  const loading = useSelector(state=>state.user.loading)
+  
+  
 
 
   const [userName, setUserName] = useState(user.body.userName);
@@ -13,15 +17,13 @@ export default function EditUsername( {onCancel} ) {
 
   const handleSave = () => {
     if (token) {
-      const userUpdate = {userName}
+      const userUpdate = { userName }
       dispatch(updateUserName({ userUpdate, token }));
       onCancel()
-      
     }
   };
 
   
-
   return (
     <div className="edit-user-container">
       <h2>Edit User Info</h2>
@@ -58,7 +60,7 @@ export default function EditUsername( {onCancel} ) {
 
         <div className="buttons">
           <button type="button" onClick={handleSave}>
-            Save
+           {loading ? 'loading' : 'Save'}
           </button>
 
           <button type="button" onClick={onCancel}>

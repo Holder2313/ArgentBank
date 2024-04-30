@@ -3,8 +3,8 @@ import userIcon from "../assets/icons/user-circle.svg";
 import { useDispatch, useSelector } from "react-redux";
 
 import { useNavigate } from "react-router";
-import { loginUser } from "../features/loginUser";
-import {getUser} from "../features/getUser";
+import { loginUser, logStorage } from "../features/loginUser";
+import { getUser } from "../features/getUser";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -12,10 +12,31 @@ export default function SignIn() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const { loading, token, user } = useSelector((state) => state.login);
+  const { loading, token } = useSelector((state) => state.login);
+  const user = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const loginFunction = (userLogin, rememberMe) => {
+    dispatch(loginUser({ userLogin, rememberMe })).then((result) => {
+    
+    if (result.payload.status === 200 || localStorage.getItem("token")) {
+      setEmail("");
+      setPassword("");
+      navigate("/user");
+
+      // if (rememberMe) {
+      //   localStorage.setItem("token", result.payload.body.token);
+      // }
+    } else {
+      setErrorMsg(
+        result && result.payload ? result.payload.error : "Unknown error"
+      );
+    }
+  });
+  }
+  
 
   const handleRememberMe = (e) => {
     setRememberMe(e.target.checked);
@@ -27,32 +48,21 @@ export default function SignIn() {
       email: email,
       password: password,
     };
-
-    dispatch(loginUser(userLogin)).then((result) => {
-      if (result.payload.status === 200) {
-        setEmail("");
-        setPassword("");
-        navigate("/user");
-
-        if (rememberMe) {
-          localStorage.setItem("user", "connected");
-        }
-      } else {
-        setErrorMsg(
-          result && result.payload ? result.payload.error : "Unknown error"
-        );
-      }
-    });
+    loginFunction(userLogin, rememberMe);
+    if (rememberMe) {
+      localStorage.setItem("token", token);
+    }
   };
 
+
   useEffect(() => {
+    const storedToken =
+      localStorage.getItem("token");
+
     if (token) {
-      console.log(token);
-      alert("test");
-      const tokenUser = token;
-      dispatch(getUser(tokenUser));
+      dispatch(getUser(token));
     }
-  }, [token, dispatch, user]);
+  }, [dispatch, token]);
 
   return (
     <main className="main bg-dark">
@@ -88,7 +98,7 @@ export default function SignIn() {
               checked={rememberMe}
               onChange={handleRememberMe}
             />
-            <label htmlFor="remem ber-me">Remember me</label>
+            <label htmlFor="remember-me">Remember me</label>
           </div>
 
           <button className="sign-in-button">

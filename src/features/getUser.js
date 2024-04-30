@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const getUser = createAsyncThunk(
-    'login/getUser',
+    'user/getUser',
     async (token) => {
         try {
             console.log(token);
@@ -28,6 +28,34 @@ export const getUser = createAsyncThunk(
     } 
 )
 
+export const updateUserName = createAsyncThunk(
+    'login/updateUserName',
+    async ({ userUpdate, token }) => {
+
+        try {
+
+            const response = await fetch("http://localhost:3001/api/v1/user/profile", {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(userUpdate),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Echech de la connexion');
+            }
+
+            return data;
+
+        } catch (error) {
+            return { error: error.message };
+
+        }
+    }
+)
 
 const getUserSlice = createSlice({
     name: 'user',
@@ -47,13 +75,27 @@ const getUserSlice = createSlice({
                 if (action) {
                     state.user = action.payload;
                 }
-                console.log(action.payload);
                 
             })
             .addCase(getUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
-            });
+            })
+
+
+            .addCase(updateUserName.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateUserName.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+
+            })
+            .addCase(updateUserName.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
     },
 
 })

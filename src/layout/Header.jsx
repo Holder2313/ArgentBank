@@ -11,16 +11,14 @@ import { logoutUser } from '../features/loginUser';
 export default function Header() {
 
   const Auth = useSelector((state) => state.login.isAuth); 
-  const user = useSelector((state) => state.login.user);
+  const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
   console.log(Auth);
 
  
-  // if (!user || !user.firstName) {
-  //   return null;
-  // }
+ 
   
   const authStorage = localStorage.getItem('user');
   const isAuth = Auth || authStorage;
@@ -29,7 +27,7 @@ export default function Header() {
   function handleLogOut() {
     dispatch(logoutUser());
     localStorage.removeItem('user');
-    navigate('/signIn');
+    navigate('/');
 
   }
   
