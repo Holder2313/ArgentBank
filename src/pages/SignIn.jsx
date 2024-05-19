@@ -1,69 +1,65 @@
 import React, { useEffect, useState } from "react";
-import userIcon from "../assets/icons/user-circle.svg";
 import { useDispatch, useSelector } from "react-redux";
-
 import { useNavigate } from "react-router";
-import { loginUser, logStorage } from "../features/loginUser";
+import userIcon from "../assets/icons/user-circle.svg";
+
+// Actions Redux pour les opérations de login et de récupération des données utilisateur
+import { loginUser } from "../features/loginUser";
 import { getUser } from "../features/getUser";
 
 export default function SignIn() {
+  // État local pour les formulaires de connexion, msg d'erreur, checkbox rememberMe
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
 
+  // Etat du login depuis le store Redux
   const { loading, token } = useSelector((state) => state.login);
-  const user = useSelector((state) => state.user);
 
+  // Hooks
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Fonction de connexion qui envoie les données au serveur
   const loginFunction = (userLogin, rememberMe) => {
     dispatch(loginUser({ userLogin, rememberMe })).then((result) => {
-    
-    if (result.payload.status === 200 || localStorage.getItem("token")) {
-      setEmail("");
-      setPassword("");
-      navigate("/user");
+      if (result.payload.status === 200 || localStorage.getItem("token")) {
+        setEmail("");
+        setPassword("");
+        navigate("/user");
+      } else {
+        setErrorMsg(
+          result && result.payload ? result.payload.error : "Unknown error"
+        );
+      }
+    });
+  };
 
-      // if (rememberMe) {
-      //   localStorage.setItem("token", result.payload.body.token);
-      // }
-    } else {
-      setErrorMsg(
-        result && result.payload ? result.payload.error : "Unknown error"
-      );
-    }
-  });
-  }
-  
-
+  // Gestion de la case à cocher Remember Me
   const handleRememberMe = (e) => {
     setRememberMe(e.target.checked);
   };
 
-  const handleLogin = (e) => {
+  // gestion de la soumission du formulaire
+  const handleLogin = (e) => { 
     e.preventDefault();
     let userLogin = {
       email: email,
       password: password,
     };
     loginFunction(userLogin, rememberMe);
-    if (rememberMe) {
-      localStorage.setItem("token", token);
-    }
   };
 
-
+  // Récupération des données utilisateur après le login
   useEffect(() => {
-    const storedToken =
-      localStorage.getItem("token");
-
     if (token) {
       dispatch(getUser(token));
     }
   }, [dispatch, token]);
 
+
+  
   return (
     <main className="main bg-dark">
       <section className="sign-in-content">

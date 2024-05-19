@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
+
+// import composants
 import { updateUserName } from "../features/getUser";
 
 
-export default function EditUsername( {onCancel} ) {
+export default function EditUsername({ onCancel }) {
+  // Récupération des données depuis le store Redux
   const user = useSelector((state) => state.user.user);
   const token = useSelector((state) => state.login.token);
   const loading = useSelector(state=>state.user.loading)
   
-  
-
-
+  // Etat local pour le formulaire de modification du nom d'utilisateur
   const [userName, setUserName] = useState(user.body.userName);
 
+  // Hooks
   const dispatch = useDispatch();
 
+  // Fonction de sauvegarde des modifications
   const handleSave = () => {
     if (token) {
       const userUpdate = { userName }
@@ -60,7 +64,7 @@ export default function EditUsername( {onCancel} ) {
 
         <div className="buttons">
           <button type="button" onClick={handleSave}>
-           {loading ? 'loading' : 'Save'}
+           {!loading ? 'loading' : 'Save'}
           </button>
 
           <button type="button" onClick={onCancel}>
@@ -71,3 +75,7 @@ export default function EditUsername( {onCancel} ) {
     </div>
   );
 }
+
+EditUsername.propTypes = {
+  onCancel: PropTypes.func,
+};

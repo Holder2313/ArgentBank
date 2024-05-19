@@ -1,23 +1,64 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+// import composants
 import AccountContent from "../components/AccountContent";
 import EditUsername from "../components/EditUsername";
-import { useSelector } from "react-redux";
+
+// Actions Redux pour récupération des données utilisateur
+import {getUser} from "../features/getUser"; 
+
 
 export default function User() {
+  // Récupération des données depuis le store Redux
+  const user = useSelector((state) => state.user.user);
+  const { isAuth, token } = useSelector((state) => state.login);
+
+  // etat pour le mode edition
   const [editMode, setEditMode] = useState(false);
 
-  const user = useSelector((state) => state.user.user);
-  console.log(user);
+  // Hooks
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  
+  //recuperation les données si actualisation
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(getUser(token));
+      console.log(user);
+    } else {
+      navigate("/signin");
+    }
+  }, [dispatch, navigate, isAuth, token, user]);
+
+
+  //fonctions pour activer/desactiver le mode edition
   const handleEditClick = () => {
     setEditMode(true);
   };
-
-  
   const handleCancel = () => {
     setEditMode(false);
   };
+
+
+  // Données simulées pour les comptes
+  const accounts = [
+    {
+      title: "Argent Bank Checking (x8349)",
+      amount: "$2,082.79",
+      description: "Available Balance",
+    },
+    {
+      title: "Argent Bank Savings (x6712)",
+      amount: "$10,928.42",
+      description: "Available Balance",
+    },
+    {
+      title: "Argent Bank Credit Card (x8349)",
+      amount: "$184.30",
+      description: "Current Balance",
+    },
+  ];
 
   return (
     <main className="main bg-dark">
@@ -38,22 +79,16 @@ export default function User() {
 
       <h2 className="sr-only">Accounts</h2>
 
+     
       <section>
-        <AccountContent
-          title={"Argent Bank Checking (x8349)"}
-          amount={"$2,082.79"}
-          amountDescription={"Available Balance"}
-        />
-        <AccountContent
-          title={"Argent Bank Savings (x6712)"}
-          amount={"$10,928.42"}
-          amountDescription={"Available Balance"}
-        />
-        <AccountContent
-          title={"Argent Bank Credit Card (x8349)"}
-          amount={"$184.30"}
-          amountDescription={"Current Balance"}
-        />
+        {accounts.map((account, index) => (
+          <AccountContent
+            key={index}
+            title={account.title}
+            amount={account.amount}
+            amountDescription={account.description}
+          />
+        ))}
       </section>
     </main>
   );
